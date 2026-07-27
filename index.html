@@ -5,34 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>쿠키런 다중 아이디 쿠폰 등록기</title>
 
-  <!-- 카카오톡 및 SNS 공유 (Open Graph) 메타 태그 추가 -->
+  <!-- Open Graph 메타 태그 -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="쿠폰 넣어줄 여쟈 없냐 여쟈">
   <meta property="og:description" content="너가 못 넣은 쿠폰 내가 넣을수도잇지ㅋㅅㅋ">
   <meta property="og:image" content="https://github.com/Jayeee11/coupon/blob/main/a.jpg?raw=true">
 
   <style>
+    @font-face {
+      font-family: 'CookieRun';
+      src: url('./CookieRun Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
 
-      @font-face {
-    font-family: 'CookieRun';
-    /* 같은 폴더에 있으므로 ./파일명 으로 불러옵니다 */
-    src: url('./CookieRun Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'CookieRun Regular.ttf';
-    src: url('./CookieRun Regular.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-  }
-
-  /* 모든 요소에 폰트 적용 */
-  * {
-    font-family: 'CookieRun', sans-serif !important;
-  }
-  
+    * {
+      font-family: 'CookieRun', sans-serif !important;
+    }
+    
     :root {
       --bg-color: #f4f6f8;
       --card-bg: #ffffff;
@@ -43,7 +33,6 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg-color);
       color: var(--text);
       margin: 0;
@@ -91,19 +80,13 @@
       font-weight: bold;
     }
 
-    input, select, button {
+    input, button {
       width: 100%;
       padding: 10px;
       border-radius: 6px;
       border: 1px solid var(--border);
       box-sizing: border-box;
       font-size: 14px;
-    }
-
-    input:disabled {
-      background-color: #f5f5f5;
-      color: #888;
-      cursor: not-allowed;
     }
 
     button {
@@ -157,16 +140,6 @@
       font-size: 12px;
       white-space: pre-wrap;
     }
-
-    .notice {
-      background: #fffbe6;
-      border: 1px solid #ffe58f;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #873800;
-      margin-top: 16px;
-    }
   </style>
 </head>
 <body>
@@ -174,28 +147,19 @@
 <div class="container">
   <h2>🍪 쿠키런 쿠폰 자동 등록기</h2>
 
-  <!-- 게임 선택 -->
-  <div class="section">
-    <label for="gameSelect">게임 선택</label>
-    <select id="gameSelect">
-      <option value="cookierun-ovenbreak">쿠키런: 오븐브레이크</option>
-    </select>
-  </div>
-
-  <!-- 아이디 관리 -->
+  <!-- 계정 목록 -->
   <div class="section">
     <div class="label-wrapper">
-      <label style="margin-bottom:0;">등록된 계정 MID 목록 (쿠오븐 계정)</label>
+      <label style="margin-bottom:0;">등록된 계정 MID 목록</label>
       <span class="count-badge" id="idCount">총 0개</span>
     </div>
-    <input type="text" placeholder="ID 추가는 공지댓글에 MID 쓰고 말하기" disabled>
     <ul class="id-list" id="idList"></ul>
   </div>
 
   <!-- 쿠폰 번호 입력 -->
   <div class="section">
     <label for="couponCode">쿠폰 번호</label>
-    <input type="text" id="couponCode" placeholder="쿠폰 코드 입력 (예: COOKIE10000GEMS)">
+    <input type="text" id="couponCode" placeholder="쿠폰 코드를 입력하세요 (예: MEETALLULOSENOVA)">
   </div>
 
   <!-- 실행 버튼 -->
@@ -206,41 +170,15 @@
     <label>진행 로그</label>
     <div class="log-box" id="logBox">대기 중...</div>
   </div>
-
-  <!-- CORS 차단 주의 상자 -->
-  <div class="notice">
-    ⚠️ <strong>CORS 차단 주의:</strong> 웹 브라우저 보안 정책상 데브플레이 서버로 직접 전송이 차단될 수 있습니다. 정상 동작하지 않을 경우 Chrome 확장프로그램 <strong>"Allow CORS"</strong>를 켜고 실행해 주세요.
-  </div>
 </div>
 
 <script>
-  // 고정 등록된 22개 계정 ID 목록
+  // 쿠키런 계정 MID 목록
   const userIds = [
-    'WWKJC1213',
-    'RMZTH1468',
-    'ZBYXZ5874',
-    'PFSVL3829',
-    'CWFJX8493',
-    'KPMJH1916',
-    'LXGNN3104',
-    'NTTVJ8412',
-    'PDGNF3609',
-    'JXNNF2720',
-    'WTVZS6070',
-    'YGGZV3464',
-    'GWRSW6508',
-    'HGKDF4935',
-    'SVQNV9916',
-    'NCDNX3517',
-    'HRMSL2478',
-    'FFQSD4879',
-    'JXPNM3994',
-    'CYMSV2755',
-    'BCSTS5734',
-    'BGHBL1466'
+    'WDVLL2672',
+    'WWKJC1213'
   ];
 
-  // 초기화 시 목록 불러오기
   renderIdList();
 
   function renderIdList() {
@@ -266,46 +204,55 @@
 
   async function registerAllCoupons() {
     const couponCode = document.getElementById('couponCode').value.trim();
-    const game = document.getElementById('gameSelect').value;
     const submitBtn = document.getElementById('submitBtn');
 
-    if (userIds.length === 0) return alert('최소 하나 이상의 아이디가 필요합니다.');
+    if (userIds.length === 0) return alert('계정이 없습니다.');
     if (!couponCode) return alert('쿠폰 번호를 입력해 주세요.');
 
     document.getElementById('logBox').textContent = '>>> 쿠폰 등록 작업을 시작합니다...';
     submitBtn.disabled = true;
 
-    const endpoint = `https://coupon.devplay.com/coupon/${game}/ko`;
+    // 데브플레이 쿠폰 등록 직접 엔드포인트
+    const endpoint = 'https://coupon.devsgb.com/coupon/use';
 
     for (let i = 0; i < userIds.length; i++) {
-      const userId = userIds[i];
-      log(`[${i + 1}/${userIds.length}] ${userId} 계정 처리 중...`);
+      const mid = userIds[i];
+      log(`[${i + 1}/${userIds.length}] 계정 MID(${mid}) 등록 시도 중...`);
 
       try {
         const formData = new URLSearchParams();
-        formData.append('email', userId);
+        formData.append('mid', mid);
         formData.append('coupon_code', couponCode);
+        formData.append('combo_name', 'dc_coupon');
 
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
           },
           body: formData
         });
 
+        const data = await response.json().catch(() => null);
+
+        const serverMsg = data?.message 
+                       || data?.reason 
+                       || data?.msg 
+                       || data?.error_message 
+                       || (typeof data?.error === 'string' ? data.error : data?.error?.message)
+                       || JSON.stringify(data);
+
         if (response.ok) {
-          log(`  └ ✅ 성공 또는 처리 완료 (상태: ${response.status})`);
+          log(`  └ ✅ 성공: ${serverMsg}`);
         } else {
-          log(`  └ ❌ 실패 (상태 코드: ${response.status})`);
+          log(`  └ ❌ 실패: ${serverMsg}`);
         }
       } catch (err) {
         log(`  └ ⚠️ 오류 발생: ${err.message}`);
-        log(`     (CORS 제한 문제인 경우 브라우저 확장프로그램 확인 필요)`);
       }
 
-      // 서버 과부하 방지를 위한 0.5초 대기
-      await new Promise(res => setTimeout(res, 500));
+      // 1초 대기
+      await new Promise(res => setTimeout(res, 1000));
     }
 
     log('>>> 모든 등록 작업이 끝났습니다.');
