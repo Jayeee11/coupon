@@ -7,6 +7,10 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('서버가 정상 작동 중입니다!');
+});
+
 app.post('/register', async (req, res) => {
   const { email, coupon_code } = req.body;
 
