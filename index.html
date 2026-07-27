@@ -78,6 +78,19 @@
       font-size: 14px;
     }
 
+    .label-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .count-badge {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
     input, select, button {
       width: 100%;
       padding: 10px;
@@ -87,18 +100,10 @@
       font-size: 14px;
     }
 
-    .row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .row input {
-      flex: 1;
-    }
-
-    .row button {
-      width: auto;
-      white-space: nowrap;
+    input:disabled {
+      background-color: #f5f5f5;
+      color: #888;
+      cursor: not-allowed;
     }
 
     button {
@@ -141,17 +146,6 @@
       border-bottom: none;
     }
 
-    .btn-del {
-      background: #ff4d4f;
-      color: white;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      width: auto;
-    }
-
     .log-box {
       background: #1e1e1e;
       color: #00ff66;
@@ -190,11 +184,11 @@
 
   <!-- 아이디 관리 -->
   <div class="section">
-    <label>저장된 계정 ID (DevPlay 계정)</label>
-    <div class="row">
-      <input type="text" id="newUserId" placeholder="계정 MID 입력">
-      <button onclick="addUserId()">추가</button>
+    <div class="label-wrapper">
+      <label style="margin-bottom:0;">등록된 계정 MID 목록 (쿠오븐 계정)</label>
+      <span class="count-badge" id="idCount">총 0개</span>
     </div>
+    <input type="text" placeholder="ID 추가는 죽죽이에게 문의" disabled>
     <ul class="id-list" id="idList"></ul>
   </div>
 
@@ -220,47 +214,48 @@
 </div>
 
 <script>
-  let userIds = JSON.parse(localStorage.getItem('cr_user_ids') || '[]');
+  // 고정 등록된 22개 계정 ID 목록
+  const userIds = [
+    'WWKJC1213',
+    'RMZTH1468',
+    'ZBYXZ5874',
+    'PFSVL3829',
+    'CWFJX8493',
+    'KPMJH1916',
+    'LXGNN3104',
+    'NTTVJ8412',
+    'PDGNF3609',
+    'JXNNF2720',
+    'WTVZS6070',
+    'YGGZV3464',
+    'GWRSW6508',
+    'HGKDF4935',
+    'SVQNV9916',
+    'NCDNX3517',
+    'HRMSL2478',
+    'FFQSD4879',
+    'JXPNM3994',
+    'CYMSV2755',
+    'BCSTS5734',
+    'BGHBL1466'
+  ];
 
   // 초기화 시 목록 불러오기
   renderIdList();
 
   function renderIdList() {
     const listEl = document.getElementById('idList');
-    listEl.innerHTML = '';
+    const countEl = document.getElementById('idCount');
     
-    if (userIds.length === 0) {
-      listEl.innerHTML = '<li class="id-item" style="color:#888;">저장된 아이디가 없습니다.</li>';
-      return;
-    }
+    listEl.innerHTML = '';
+    countEl.textContent = `총 ${userIds.length}개`;
 
-    userIds.forEach((id, index) => {
+    userIds.forEach((id) => {
       const li = document.createElement('li');
       li.className = 'id-item';
-      li.innerHTML = `
-        <span>${id}</span>
-        <button class="btn-del" onclick="deleteUserId(${index})">삭제</button>
-      `;
+      li.innerHTML = `<span>${id}</span>`;
       listEl.appendChild(li);
     });
-  }
-
-  function addUserId() {
-    const input = document.getElementById('newUserId');
-    const id = input.value.trim();
-    if (!id) return alert('아이디를 입력해 주세요.');
-    if (userIds.includes(id)) return alert('이미 등록된 아이디입니다.');
-
-    userIds.push(id);
-    localStorage.setItem('cr_user_ids', JSON.stringify(userIds));
-    input.value = '';
-    renderIdList();
-  }
-
-  function deleteUserId(index) {
-    userIds.splice(index, 1);
-    localStorage.setItem('cr_user_ids', JSON.stringify(userIds));
-    renderIdList();
   }
 
   function log(msg) {
@@ -274,7 +269,7 @@
     const game = document.getElementById('gameSelect').value;
     const submitBtn = document.getElementById('submitBtn');
 
-    if (userIds.length === 0) return alert('최소 하나 이상의 아이디를 추가해 주세요.');
+    if (userIds.length === 0) return alert('최소 하나 이상의 아이디가 필요합니다.');
     if (!couponCode) return alert('쿠폰 번호를 입력해 주세요.');
 
     document.getElementById('logBox').textContent = '>>> 쿠폰 등록 작업을 시작합니다...';
