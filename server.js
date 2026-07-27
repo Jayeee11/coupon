@@ -7,21 +7,24 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// 루트 접속 테스트용
+app.get('/', (req, res) => {
+  res.send('쿠키런 쿠폰 프록시 서버 작동 중');
+});
+
 app.post('/register', async (req, res) => {
-  // 프론트엔드에서 보낸 mid, coupon_code, game 받기
-  const { mid, email, coupon_code, game } = req.body;
-  
-  // mid 파라미터 우선 사용 (email로 넘어왔을 경우 대비 예외처리)
-  const userMid = mid || email;
+  // 프론트엔드에서 mid와 coupon_code만 전달받음
+  const { mid, coupon_code } = req.body;
+
   const devplayUrl = 'https://coupon.devsgb.com/coupon/use';
 
   try {
     const response = await axios.post(
       devplayUrl,
       new URLSearchParams({
-        mid: userMid,                                      // 9자리 회원번호 (MID)
-        coupon_code: coupon_code,                          // 쿠폰 코드
-        combo_name: game || 'cookierun-ovenbreak'         // 게임 구분값
+        mid: mid,                       // 회원 MID (예: WWKJC1213)
+        coupon_code: coupon_code,       // 쿠폰 코드 (예: MEETALLULOSENOVA)
+        combo_name: 'dc_coupon'         // 확인된 데브플레이 고유 키값
       }).toString(),
       {
         headers: {
@@ -33,15 +36,15 @@ app.post('/register', async (req, res) => {
       }
     );
 
-    // 성공 응답 전송
+    // 데브플레이 성공 결과 전달
     res.json(response.data);
   } catch (error) {
     if (error.response) {
-      // 400 에러 발생 시 데브플레이가 보낸 상세 세부 에러 메시지 반환
-      console.error('Devplay Error Body:', error.response.data);
+      // 데브플레이 에러 응답 전달
+      console.error('Devplay Error:', error.response.data);
       res.status(error.response.status).json(error.response.data);
     } else {
-      res.status(500).json({ message: '데브플레이 서버 통신 오류' });
+      res.status(500).json({ message: '데브플레이 서버 통신 오류가 발생했습니다.' });
     }
   }
 });
