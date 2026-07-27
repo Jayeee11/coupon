@@ -9,23 +9,30 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="쿠폰 넣어줄 여쟈 없냐 여쟈">
   <meta property="og:description" content="너가 못 넣은 쿠폰 내가 넣을수도잇지ㅋㅅㅋ">
-  <meta property="og:image" content="https://github.com/Jayeee11/coupon/blob/main/a.jpg">
+  <meta property="og:image" content="https://github.com/Jayeee11/coupon/blob/main/a.jpg?raw=true">
 
   <style>
-    /* 🍪 쿠키런체 웹폰트 불러오기 */
-    @font-face {
-      font-family: 'CookieRun-Regular';
-      src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2010@1.0/CookieRun-Regular.woff2') format('woff2');
-      font-weight: normal;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'CookieRun-Bold';
-      src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonnu-2010@1.0/CookieRun-Bold.woff2') format('woff2');
-      font-weight: bold;
-      font-style: normal;
-    }
 
+      @font-face {
+    font-family: 'CookieRun';
+    /* 같은 폴더에 있으므로 ./파일명 으로 불러옵니다 */
+    src: url('./CookieRun Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'CookieRun Regular.ttf';
+    src: url('./CookieRun Regular.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+  }
+
+  /* 모든 요소에 폰트 적용 */
+  * {
+    font-family: 'CookieRun', sans-serif !important;
+  }
+  
     :root {
       --bg-color: #f4f6f8;
       --card-bg: #ffffff;
@@ -36,8 +43,7 @@
     }
 
     body {
-      /* 기본 폰트를 쿠키런체로 설정 */
-      font-family: 'CookieRun-Regular', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg-color);
       color: var(--text);
       margin: 0;
@@ -59,8 +65,6 @@
       margin-top: 0;
       color: var(--primary);
       text-align: center;
-      /* 제목 및 강조 구문은 쿠키런 볼드체 적용 */
-      font-family: 'CookieRun-Bold', sans-serif;
     }
 
     .section {
@@ -72,7 +76,6 @@
       font-weight: bold;
       margin-bottom: 6px;
       font-size: 14px;
-      font-family: 'CookieRun-Bold', sans-serif;
     }
 
     input, select, button {
@@ -82,7 +85,6 @@
       border: 1px solid var(--border);
       box-sizing: border-box;
       font-size: 14px;
-      font-family: 'CookieRun-Regular', sans-serif;
     }
 
     .row {
@@ -103,9 +105,9 @@
       background-color: var(--primary);
       color: white;
       border: none;
+      font-weight: bold;
       cursor: pointer;
       transition: background 0.2s;
-      font-family: 'CookieRun-Bold', sans-serif;
     }
 
     button:hover {
@@ -153,7 +155,7 @@
     .log-box {
       background: #1e1e1e;
       color: #00ff66;
-      font-family: monospace; /* 로그 박스는 가독성을 위해 고정폭 폰트 유지 */
+      font-family: monospace;
       padding: 12px;
       border-radius: 6px;
       height: 150px;
