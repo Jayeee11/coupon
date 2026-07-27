@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠키런 다중 아이디 쿠폰 등록기</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --primary: #f25278;
+      --primary-hover: #d93d62;
+      --text: #333333;
+      --border: #dddddd;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .row input {
+      flex: 1;
+    }
+
+    .row button {
+      width: auto;
+      white-space: nowrap;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .id-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0 0;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .id-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .id-item:last-child {
+      border-bottom: none;
+    }
+
+    .btn-del {
+      background: #ff4d4f;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      width: auto;
+    }
+
+    .log-box {
+      background: #1e1e1e;
+      color: #00ff66;
+      font-family: monospace;
+      padding: 12px;
+      border-radius: 6px;
+      height: 150px;
+      overflow-y: auto;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
+    .notice {
+      background: #fffbe6;
+      border: 1px solid #ffe58f;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #873800;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🍪 쿠키런 쿠폰 자동 등록기</h2>
+
+  <div class="notice">
+    ⚠️ <strong>CORS 차단 주의:</strong> 웹 브라우저 보안 정책상 데브플레이 서버로 직접 전송이 차단될 수 있습니다. 정상 동작하지 않을 경우 Chrome 확장프로그램 <strong>"Allow CORS"</strong>를 켜고 실행해 주세요.
+  </div>
+
+  <!-- 게임 선택 -->
+  <div class="section">
+    <label for="gameSelect">게임 선택</label>
+    <select id="gameSelect">
+      <option value="cookierun-ovenbreak">쿠키런: 오븐브레이크</option>
+    </select>
+  </div>
+
+  <!-- 아이디 관리 -->
+  <div class="section">
+    <label>저장된 계정 ID (DevPlay 계정)</label>
+    <div class="row">
+      <input type="text" id="newUserId" placeholder="계정 MID 입력)">
+      <button onclick="addUserId()">추가</button>
+    </div>
+    <ul class="id-list" id="idList"></ul>
+  </div>
+
+  <!-- 쿠폰 번호 입력 -->
+  <div class="section">
+    <label for="couponCode">쿠폰 번호</label>
+    <input type="text" id="couponCode" placeholder="쿠폰 코드 입력 (예: COOKIE10000GEMS)">
+  </div>
+
+  <!-- 실행 버튼 -->
+  <button id="submitBtn" onclick="registerAllCoupons()">등록 시작하기</button>
+
+  <!-- 로그 출력 -->
+  <div class="section" style="margin-top: 20px;">
+    <label>진행 로그</label>
+    <div class="log-box" id="logBox">대기 중...</div>
+  </div>
+</div>
+
+<script>
+  let userIds = JSON.parse(localStorage.getItem('cr_user_ids') || '[]');
+
+  // 초기화 시 목록 불러오기
+  renderIdList();
+
+  function renderIdList() {
+    const listEl = document.getElementById('idList');
+    listEl.innerHTML = '';
+    
+    if (userIds.length === 0) {
+      listEl.innerHTML = '<li class="id-item" style="color:#888;">저장된 아이디가 없습니다.</li>';
+      return;
+    }
+
+    userIds.forEach((id, index) => {
+      const li = document.createElement('li');
+      li.className = 'id-item';
+      li.innerHTML = `
+        <span>${id}</span>
+        <button class="btn-del" onclick="deleteUserId(${index})">삭제</button>
+      `;
+      listEl.appendChild(li);
+    });
+  }
+
+  function addUserId() {
+    const input = document.getElementById('newUserId');
+    const id = input.value.trim();
+    if (!id) return alert('아이디를 입력해 주세요.');
+    if (userIds.includes(id)) return alert('이미 등록된 아이디입니다.');
+
+    userIds.push(id);
+    localStorage.setItem('cr_user_ids', JSON.stringify(userIds));
+    input.value = '';
+    renderIdList();
+  }
+
+  function deleteUserId(index) {
+    userIds.splice(index, 1);
+    localStorage.setItem('cr_user_ids', JSON.stringify(userIds));
+    renderIdList();
+  }
+
+  function log(msg) {
+    const logBox = document.getElementById('logBox');
+    logBox.textContent += '\n' + msg;
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  async function registerAllCoupons() {
+    const couponCode = document.getElementById('couponCode').value.trim();
+    const game = document.getElementById('gameSelect').value;
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (userIds.length === 0) return alert('최소 하나 이상의 아이디를 추가해 주세요.');
+    if (!couponCode) return alert('쿠폰 번호를 입력해 주세요.');
+
+    document.getElementById('logBox').textContent = '>>> 쿠폰 등록 작업을 시작합니다...';
+    submitBtn.disabled = true;
+
+    const endpoint = `https://coupon.devplay.com/coupon/${game}/ko`;
+
+    for (let i = 0; i < userIds.length; i++) {
+      const userId = userIds[i];
+      log(`[${i + 1}/${userIds.length}] ${userId} 계정 처리 중...`);
+
+      try {
+        const formData = new URLSearchParams();
+        formData.append('email', userId);
+        formData.append('coupon_code', couponCode);
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData
+        });
+
+        if (response.ok) {
+          log(`  └ ✅ 성공 또는 처리 완료 (상태: ${response.status})`);
+        } else {
+          log(`  └ ❌ 실패 (상태 코드: ${response.status})`);
+        }
+      } catch (err) {
+        log(`  └ ⚠️ 오류 발생: ${err.message}`);
+        log(`     (CORS 제한 문제인 경우 브라우저 확장프로그램 확인 필요)`);
+      }
+
+      // 서버 과부하 방지를 위한 0.5초 대기
+      await new Promise(res => setTimeout(res, 500));
+    }
+
+    log('>>> 모든 등록 작업이 끝났습니다.');
+    submitBtn.disabled = false;
+  }
+</script>
+
+</body>
+</html>
