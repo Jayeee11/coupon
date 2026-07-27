@@ -175,7 +175,7 @@
 <script>
   // 쿠키런 계정 MID 목록
   const userIds = [
-    'WDVLL2672',
+    'CQBZB6757',
     'WWKJC1213'
   ];
 
@@ -212,7 +212,8 @@
     document.getElementById('logBox').textContent = '>>> 쿠폰 등록 작업을 시작합니다...';
     submitBtn.disabled = true;
 
-   const endpoint = 'https://coupon-5q13.onrender.com/register';
+    // 데브플레이 쿠폰 등록 직접 엔드포인트
+    const endpoint = 'https://coupon-5q13.onrender.com/register';
 
     for (let i = 0; i < userIds.length; i++) {
       const mid = userIds[i];
@@ -220,9 +221,8 @@
 
       try {
         const formData = new URLSearchParams();
-        formData.append('mid', mid);
-        formData.append('coupon_code', couponCode);
-        formData.append('combo_name', 'dc_coupon');
+formData.append('mid', mid);
+formData.append('coupon_code', couponCode);
 
         const response = await fetch(endpoint, {
           method: 'POST',
