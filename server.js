@@ -7,44 +7,52 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 루트 접속 테스트용
 app.get('/', (req, res) => {
-  res.send('쿠키런 쿠폰 프록시 서버 작동 중');
+  res.send('쿠키런 쿠폰 등록 프록시 서버 작동 중');
 });
 
 app.post('/register', async (req, res) => {
-  // 프론트엔드에서 mid와 coupon_code만 전달받음
-  const { mid, coupon_code } = req.body;
+  let { mid, coupon_code } = req.body;
+
+  // 1. 공백 제거 (trim) 및 대문자 변환으로 오타 방지
+  mid = mid ? String(mid).trim() : '';
+  coupon_code = coupon_code ? String(coupon_code).trim().toUpperCase() : '';
+
+  if (!mid || !coupon_code) {
+    return res.status(400).json({ message: 'MID와 쿠폰 코드를 모두 입력해 주세요.' });
+  }
 
   const devplayUrl = 'https://coupon.devsgb.com/coupon/use';
 
   try {
+    // 2. Exact Payload 구성
+    const params = new URLSearchParams();
+    params.append('mid', mid);
+    params.append('coupon_code', coupon_code);
+    params.append('combo_name', 'dc_coupon');
+
     const response = await axios.post(
       devplayUrl,
-      new URLSearchParams({
-        mid: mid,                       // 회원 MID (예: WWKJC1213)
-        coupon_code: coupon_code,       // 쿠폰 코드 (예: MEETALLULOSENOVA)
-        combo_name: 'dc_coupon'         // 확인된 데브플레이 고유 키값
-      }).toString(),
+      params.toString(),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Origin': 'https://coupon.devsgb.com',
-          'Referer': 'https://coupon.devsgb.com/'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+          'Origin': 'https://www.cookierun.com',
+          'Referer': 'https://www.cookierun.com/'
         }
       }
     );
 
-    // 데브플레이 성공 결과 전달
+    // 성공 응답 반환 (Status 200)
     res.json(response.data);
   } catch (error) {
     if (error.response) {
-      // 데브플레이 에러 응답 전달
-      console.error('Devplay Error:', error.response.data);
+      // 3. 400 에러 시 데브플레이가 돌려준 진짜 에러 데이터(예: "이미 사용된 쿠폰입니다")를 프론트로 전달
+      console.log('❌ Devplay Error Response:', error.response.data);
       res.status(error.response.status).json(error.response.data);
     } else {
-      res.status(500).json({ message: '데브플레이 서버 통신 오류가 발생했습니다.' });
+      res.status(500).json({ message: '데브플레이 서버 통신 실패' });
     }
   }
 });
